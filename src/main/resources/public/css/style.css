@@ -6,10 +6,14 @@ html {
 }
 
 body {
+    display: flex;
+    justify-content: center;
     height: 100%;
     width: 100%;
     background-color: #444;
-    padding: 16px;
 }
 
-canvas { image-rendering:pixelated; }
+canvas {
+    margin: 16px;
+    image-rendering:pixelated;
+}

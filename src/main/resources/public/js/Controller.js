@@ -8,22 +8,15 @@ class Controller {
     up = new Controller.ButtonInput();
 
     keyDownUp = (event) => {
-        let down = event.type === "keydown";
+        let down = event.type === "keydown"; // or "keyup" (false)
 
         switch (event.keyCode) {
             case 37: this.left.getInput(down); break;
-            case 38: this.left.getInput(down); break;
-            case 39: this.left.getInput(down); break;
-            case 40: this.left.getInput(down); break;
+            case 38: this.up.getInput(down); break;
+            case 39: this.right.getInput(down); break;
+            case 40: this.down.getInput(down); break;
         }
-
-        console.log(`key ${event.keyCode} has been pressed`);
     }
-
-    handleKeyDownUp = (event) => {
-        this.keyDownUp(event);
-    }
-
 }
 
 Controller.ButtonInput = class {
@@ -32,8 +25,6 @@ Controller.ButtonInput = class {
     active = false;
 
     getInput = (down) => {
-        if (this.down !== down) this.active = down;
-        this.down = this.active;
+        this.active = down;
     }
-
 }

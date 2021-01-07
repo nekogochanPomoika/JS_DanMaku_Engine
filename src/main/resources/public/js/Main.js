@@ -21,22 +21,32 @@ addEventListeners();
 
 start();
 
+function resize() {
+    display.resize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.width / game.height);
+    display.render();
+}
+
 function render() {
-    display.renderColor(game.color);
+    display.fillColor(game.backgroundColor);
+    display.drawRect(game.player);
     display.render();
 }
 
 function update(time) {
+    game.player.moveX(controller.left.active, controller.right.active);
+    game.player.moveY(controller.up.active, controller.down.active);
+
     game.update(time);
 }
 
 function addEventListeners() {
-    window.addEventListener("resize", display.handleResize);
-    window.addEventListener("keydown", controller.handleKeyDownUp);
-    window.addEventListener("keyup", controller.handleKeyDownUp);
+    window.addEventListener("resize", resize);
+    window.addEventListener("keydown", controller.keyDownUp);
+    window.addEventListener("keyup", controller.keyDownUp);
 }
 
 function start() {
-    display.resize();
+    display.setBufferSides(game.width, game.height);
+    resize();
     engine.start();
 }

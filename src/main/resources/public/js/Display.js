@@ -6,17 +6,30 @@ drawing colors to the buffer and then to the display. */
 class Display {
 
     #buffer = document.createElement("canvas").getContext("2d");
-    #canvas;
     #context;
 
     constructor(canvas) {
-        this.#canvas = canvas;
         this.#context = canvas.getContext("2d");
     }
 
-    renderColor = (color) => {
+    setBufferSides = (width, height) => {
+        this.#buffer.canvas.width = width;
+        this.#buffer.canvas.height = height;
+    }
+
+    fillColor = (color) => {
         this.#buffer.fillStyle = color;
         this.#buffer.fillRect(0, 0, this.#buffer.canvas.width, this.#buffer.canvas.height);
+    }
+
+    /**
+     * @param rect = {
+     *     x, y, width, height, color
+     * }
+     */
+    drawRect = (rect) => {
+        this.#buffer.fillStyle = rect.color;
+        this.#buffer.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 
     render = () => {
@@ -27,18 +40,14 @@ class Display {
         );
     }
 
-    resize = (event) => {
-        let height = document.documentElement.clientHeight;
-        let width = document.documentElement.clientWidth;
-
-        this.#context.canvas.height = height - 32;
-        this.#context.canvas.width = width - 32;
-
-        this.render();
+    resize = (width, height, aspectRatio) => {
+        if (width / height > aspectRatio) {
+            this.#context.canvas.width = height * aspectRatio;
+            this.#context.canvas.height = height;
+        } else {
+            this.#context.canvas.width = width;
+            this.#context.canvas.height = width / aspectRatio;
+        }
+        this.#context.imageSmoothingEnabled = false;
     }
-
-    handleResize = (event) => {
-        this.resize(event);
-    }
-
 }
