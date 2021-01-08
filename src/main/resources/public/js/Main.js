@@ -22,19 +22,19 @@ addEventListeners();
 start();
 
 function resize() {
-    display.resize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.width / game.height);
+    display.resize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.world.width / game.world.height);
     display.render();
 }
 
 function render() {
-    display.fillColor(game.backgroundColor);
-    display.drawRect(game.player);
+    display.fillColor(game.world.backgroundColor);
+    display.drawRect(game.world.player);
     display.render();
 }
 
 function update(time) {
-    game.player.moveX(controller.left.active, controller.right.active);
-    game.player.moveY(controller.up.active, controller.down.active);
+    game.world.player.moveX(controller.left.active, controller.right.active);
+    game.world.player.moveY(controller.up.active, controller.down.active);
 
     game.update(time);
 }
@@ -46,7 +46,7 @@ function addEventListeners() {
 }
 
 function start() {
-    display.setBufferSides(game.width, game.height);
+    display.setBufferSides(game.world.width, game.world.height);
     resize();
     engine.start();
 }
