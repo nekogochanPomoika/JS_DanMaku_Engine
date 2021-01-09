@@ -11,10 +11,9 @@ let settings = {
     fps: 60,
 }
 
-let game = new Game();
 let display = new Display(document.getElementById("gameScreen"));
 let controller = new Controller();
-
+let game = new Game();
 let engine = new Engine(1000/settings.fps, update, render);
 
 addEventListeners();
@@ -29,6 +28,9 @@ function resize() {
 function render() {
     display.fillColor(game.world.backgroundColor);
     display.drawRect(game.world.player);
+
+    game.world.bullets.forEach((b) => {display.drawRect(b)});
+
     display.render();
 }
 

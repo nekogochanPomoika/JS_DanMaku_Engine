@@ -1,22 +1,52 @@
+// some logic for show that engine works fine
 export {Game};
 
-// some logic for show that engine works fine
+import {Util} from "./Util.js";
 
 class Game {
     world = new Game.World();
 
-    update = () => {
-        this.world.update();
+    update = (time) => {
+        this.world.update(time);
     }
 }
 
 Game.World = class {
-    backgroundColor = "#3333";
 
-    height = 720;
-    width = 360;
+    time = 0;
+    backgroundColor = "#3331";
+
+    height = 2000;
+    width = 2000;
 
     player = new Game.Player();
+
+    bullets = [];
+
+    constructor() {
+        let startPosition = {x: this.width / 2, y: this.height / 2};
+
+        for (let i = 0; i < 1000; i++) {
+            let startTime = this.time;
+            setTimeout(() => {
+                this.bullets.push(
+                    new Game.Bullet()
+                        .setX(startPosition.x)
+                        .setY(startPosition.y)
+                        .setWidth(16)
+                        .setHeight(16)
+                        .setColor("#b00")
+                        .setMovingFunction(() => {
+                            let dt = this.time - startTime;
+                            if (dt > 4000) dt = i;
+                            let dr = dt / 100;
+                            let da = Math.pow(i + dt / 5000, 1.4);
+                            return Util.polarToRect(dr, da);
+                        })
+                );
+            }, Math.pow(i * 100, 0.7));
+        }
+    }
 
     collideObject = (obj) => {
         if (obj.left < 0) {
@@ -36,20 +66,26 @@ Game.World = class {
         }
     }
 
-    update = () => {
+    update = (time) => {
+        this.time = time;
+
         this.player.update();
+        this.bullets.forEach((b) => {b.update()});
         this.collideObject(this.player);
     }
 }
 
 Game.Object = class {
 
-    constructor(width, height, x, y) {
-        this.width = width;
-        this.height = height;
-        this.x = x;
-        this.y = y;
-    }
+    width;
+    height;
+    x;
+    y;
+
+    setWidth = (width) => {this.width = width; return this;}
+    setHeight = (height) => {this.height = height; return this;}
+    setX = (x) => {this.x = x; return this;}
+    setY = (y) => {this.y = y; return this;}
 
     get left() {return this.x}
     get right() {return this.x + this.width}
@@ -63,12 +99,39 @@ Game.Object = class {
 
 }
 
+Game.MovingObject = class extends Game.Object {
+
+    movingFunction;
+
+    setMovingFunction = (movingFunction) => {this.movingFunction = movingFunction; return this};
+
+    update() {
+        let dxy = this.movingFunction();
+
+        this.x += dxy.x;
+        this.y += dxy.y;
+    }
+
+}
+
+Game.Bullet = class extends Game.MovingObject {
+
+    color;
+
+    setColor = (color) => {this.color = color; return this}
+
+}
+
 Game.Player = class extends Game.Object {
 
     color = "#0b0";
 
-    constructor() {
-        super(16, 16, 180, 600);
+    constructor(x, y) {
+        super();
+        this.setWidth(64)
+            .setHeight(64)
+            .setX(x)
+            .setY(y);
     }
 
     baseVelocity = 10;
@@ -111,4 +174,3 @@ Game.Player = class extends Game.Object {
     }
 
 }
-
