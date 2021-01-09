@@ -8,7 +8,7 @@ class Display {
     #buffer = document.createElement("canvas").getContext("2d");
     #context;
 
-    constructor(canvas) {
+    init = (canvas) => {
         this.#context = canvas.getContext("2d");
     }
 

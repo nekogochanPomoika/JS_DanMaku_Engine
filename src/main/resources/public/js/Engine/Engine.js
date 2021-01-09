@@ -21,7 +21,7 @@ class Engine {
     #update;
     #render;
 
-    constructor(timeStep, update, render) {
+    init = (timeStep, update, render) => {
         this.#timeStep = timeStep;
         this.#update = update;
         this.#render = render;
