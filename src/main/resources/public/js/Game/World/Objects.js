@@ -5,11 +5,19 @@ class GameObject {
     height;
     x;
     y;
+    isAlive = true;
+
+    shouldDie;
 
     setWidth = (width) => {this.width = width; return this;}
     setHeight = (height) => {this.height = height; return this;}
     setX = (x) => {this.x = x; return this;}
     setY = (y) => {this.y = y; return this;}
+    setAlive = (alive) => {this.isAlive = alive; return this;}
+    /**
+     * @param shouldDie = f(), will be called every update();
+     */
+    setShouldDie = (shouldDie) => {this.shouldDie = shouldDie; return this;}
 
     setLeft(a) {this.x = a; return this;}
     setRight(a) {this.x = a - this.width; return this;}
@@ -41,10 +49,29 @@ class MovingObject extends GameObject {
 
         this.x += dxy.x;
         this.y += dxy.y;
+
+        if (this.shouldDie()) {
+            this.isAlive = false;
+        }
     }
 }
 
 class Bullet extends MovingObject {
+
+    static isOutOfBounds;
+
+    /**
+     * @param defaultShouldDieCondition f(Bullet.class obj) => boolean
+     */
+    static setIsOutOfBounds = (defaultShouldDieCondition) => {
+        Bullet.isOutOfBounds = defaultShouldDieCondition;
+    }
+
+    constructor() {
+        super();
+        this.shouldDie = () => Bullet.isOutOfBounds(this);
+    }
+
     color;
 
     setColor = (color) => {this.color = color; return this}

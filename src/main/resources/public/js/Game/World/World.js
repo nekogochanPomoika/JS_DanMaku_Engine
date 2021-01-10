@@ -19,12 +19,25 @@ class World {
      */
     init = (player) => {
         this.player = player;
+
+        /* i used this instead of setInterval because I want the
+        countdown starts only when the function ends instead of it starts */
+        let removeDeadBullets = () => {
+            this.removeDeadBullets();
+            setTimeout(removeDeadBullets, 100);
+        };
+        setTimeout(removeDeadBullets, 100);
+    }
+
+    removeDeadBullets = () => {
+        console.log(this.bullets.length);
+        this.bullets = this.bullets.filter((b) => b.isAlive);
     }
     
     bulletRunTest = () => {
         let startPosition = {x: this.width / 2, y: this.height / 2};
 
-        for (let i = 0; i < 2500; i++) {
+        for (let i = 0; i < 4000; i++) {
             setTimeout(() => {
                 let createTime = this.time;
                 this.bullets.push(
@@ -37,11 +50,11 @@ class World {
                             let dt = this.time - createTime;
                             if (dt > 4000) dt = i;
                             let dr = dt / 100;
-                            let da = Math.pow(i + dt / 5000, 1.7);
+                            let da = Math.pow(i + dt / 5000, 1.3);
                             return Util.polarToRect(dr, da);
                         })
                 );
-            }, Math.pow(60 * i, 0.7));
+            }, Math.pow(i * 10, 0.7));
         }
     }
 
