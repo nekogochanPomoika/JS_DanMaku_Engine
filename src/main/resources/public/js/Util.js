@@ -13,4 +13,7 @@ export class Util {
             y: r * Math.sin(a),
         }
     }
+
+    static calculateAngle = (xy1, xy2) => Math.atan2(xy2.y - xy1.y, xy2.x - xy1.x)
+
 }

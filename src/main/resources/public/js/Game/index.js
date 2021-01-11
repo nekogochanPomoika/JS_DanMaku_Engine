@@ -1,7 +1,8 @@
 import {Game} from "./Game.js";
-import {Player} from "./World/Objects.js";
+import {Mob, Player} from "./World/Objects.js";
 import {World} from "./World/World.js";
 import {Bullet} from "./World/Objects.js";
+import {Util} from "../Util.js";
 
 export {game};
 
@@ -15,6 +16,7 @@ const player = new Player();
 
 staticFieldsInit();
 init();
+testMob();
 
 function staticFieldsInit() {
     Bullet.setIsOutOfBounds((b) =>
@@ -23,14 +25,54 @@ function staticFieldsInit() {
         b.left > world.width + settings.extraBounds ||
         b.top > world.height + settings.extraBounds
     )
+    Bullet.setBulletsArray(() => world.bullets);
+    Mob.setMobsArray(() => world.mobs);
 }
 
 function init() {
-    player.setHeight(0)
-        .setWidth(0)
-        .setCenter({x: world.width / 2, y: world.height / 2});
+    player
+        .setHeight(64)
+        .setWidth(64)
+        .setCenter({x: world.width / 2, y: world.height / 4});
+
     world.init(player);
     game.init(world);
+}
+
+function testMob() {
+
+    let mob =
+        new Mob()
+            .setWidth(64)
+            .setHeight(64)
+            .setCenter({x: world.width - 50, y: world.height * 7 / 8})
+            .setAngle(-Math.PI)
+            .setMovingFunction(() => 5)
+
+    let forwardAttack = () => {
+        Bullet.baseTestBullet()
+            .setMovingFunction(() => 20)
+            .setCenter(mob.center)
+            .setAngle(Util.calculateAngle(mob.center, player.center))
+            .append();
+    }
+
+    let attackId;
+
+    mob.setAttackTypes([forwardAttack])
+        .setAttackOrder(() => {
+            attackId = setInterval(() => {
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        forwardAttack()
+                    }, i * 100);
+                }
+            }, 500)
+        })
+        .setOnDie([() => {}])
+        .append();
+
+    setTimeout(window.clearInterval, 10000, attackId);
 }
 
 world.bulletRunTest();

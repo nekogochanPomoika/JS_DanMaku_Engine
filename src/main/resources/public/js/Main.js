@@ -33,7 +33,9 @@ function start() {
 }
 
 function resize() {
-    display.resize(document.documentElement.clientWidth - 32, document.documentElement.clientHeight - 32, game.world.width / game.world.height);
+    display.resize(document.documentElement.clientWidth - 32,
+        document.documentElement.clientHeight - 32,
+        game.world.width / game.world.height);
     display.render();
 }
 
@@ -42,6 +44,7 @@ function render() {
     display.drawRect(game.world.player);
 
     game.world.bullets.forEach((b) => {display.drawRect(b)});
+    game.world.mobs.forEach((m) => {display.drawRect(m)});
 
     display.render();
 }
