@@ -30,7 +30,6 @@ class World {
     }
 
     removeDeadBullets = () => {
-        console.log(this.bullets.length);
         this.bullets = this.bullets.filter((b) => b.isAlive);
     }
     

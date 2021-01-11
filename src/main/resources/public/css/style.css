@@ -1,3 +1,4 @@
+
 * { box-sizing:border-box; margin:0; padding:0; }
 
 html {
@@ -6,14 +7,16 @@ html {
 }
 
 body {
-    display: flex;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    background-color: #444;
+    display:grid;
+    align-content:center;
+    background-color:#444;
+    justify-items:center;
+    height:100%;
+    width:100%;
 }
 
 canvas {
     margin: 16px;
     image-rendering:pixelated;
 }
+

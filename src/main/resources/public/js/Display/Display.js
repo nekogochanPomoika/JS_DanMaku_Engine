@@ -10,6 +10,7 @@ class Display {
 
     init = (canvas) => {
         this.#context = canvas.getContext("2d");
+        this._context = this.#context;
     }
 
     setBufferSides = (width, height) => {
@@ -42,8 +43,8 @@ class Display {
 
     resize = (width, height, aspectRatio) => {
         if (width / height > aspectRatio) {
-            this.#context.canvas.width = height * aspectRatio;
             this.#context.canvas.height = height;
+            this.#context.canvas.width = height * aspectRatio;
         } else {
             this.#context.canvas.width = width;
             this.#context.canvas.height = width / aspectRatio;
