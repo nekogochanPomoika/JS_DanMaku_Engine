@@ -2,7 +2,7 @@ import {Game} from "./Game.js";
 import {Mob, Player} from "./World/Objects.js";
 import {World} from "./World/World.js";
 import {Bullet} from "./World/Objects.js";
-import {BulletTemplates} from "./World/Templates.js";
+import {BulletTemplates, MobTemplates} from "./World/Templates.js";
 
 export {game};
 
@@ -40,34 +40,22 @@ function init() {
 }
 
 function testMob() {
-    let mob =
-        new Mob()
-            .setWidth(64)
-            .setHeight(64)
-            .setCenter({x: world.width - 50, y: world.height * 7 / 8})
-            .setAngle(-Math.PI)
-            .setMovingFunction(() => 12);
+    MobTemplates
+        .harmlessMob(
+            {x: 100, y: 1800},
+            Math.PI * 3 / 2,
+            () => 12
+        ).append();
 
-    mob.addIntervalAttack(() => {
-        for (let i = 0; i < 3; i++) {
-            setTimeout(() => {
-                if (mob.isAlive)
-                    BulletTemplates
-                        .littleFocusBullet(mob.center, player.center, 15)
-                        .append();
-            }, i * 75);
-        }
-    }, 500);
-
-    mob.addTimeoutAttack(() => {
-        BulletTemplates
-            .roundLittleFocusBulletsArray(
-                8, 50, mob.center, player.center
-            )
-            .forEach((b) => b.append());
-    }, 1500)
-
-    mob.append();
+    MobTemplates
+        .oneShootMob(
+            {x: world.width - 200, y: 1600},
+            Math.PI * 3 / 2,
+            () => 12,
+            player.center,
+            20,
+            1500,
+        ).append();
 }
 
 world.bulletRunTest();
