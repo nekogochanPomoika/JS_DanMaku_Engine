@@ -103,43 +103,67 @@ class Mob extends MovingObject {
      */
     static setMobsArray = (mobsArray) => {Mob.getMobsArray = mobsArray}
 
-    color = "#880";
+    color = "#bb0";
 
-    hitPoints;
+    #hitPoints;
 
-    attackTypes = [];
-    attackOrder;
+    #attacks = [];
 
-    // should remove all setIntervals / setTimeouts when mob die
-    onDie = [];
+    #onDie = [];
 
-    setHP = (hp) => {this.hitPoints = hp; return this;}
+    setHP = (hp) => {this.#hitPoints = hp; return this;}
+    setOnDie = (onDie) => {this.#onDie = onDie; return this;}
     /**
-     * @param attackTypes = [f() => void, should shoot bullets]
+     * @param type = [0 = interval, 1 = timeout]
+     * @param foo = [f() => interval / timeout ids]
      */
-    setAttackTypes = (attackTypes) => {this.attackTypes = attackTypes; return this;}
-    /**
-     * @param attackOrder = f() => void, determines how attacks will be executed
-     */
-    setAttackOrder = (attackOrder) => {this.attackOrder = attackOrder; return this;}
-    setOnDie = (onDie) => {this.onDie = onDie; return this;}
+    #addAttack = (type, foo) => {
+        this.#attacks.push({type, foo});
+        return this;
+    }
+
+    addIntervalAttack = (foo, delay) => {
+        let _foo = () => setInterval(foo, delay)
+        this.#addAttack(0, _foo);
+        return this;
+    }
+
+    addTimeoutAttack = (foo, delay) => {
+        let _foo = () => setTimeout(foo, delay);
+        this.#addAttack(1, _foo);
+        return this;
+    }
+
+    // starts attack functions, set in array attacks intervals ids
+    startAttacks = () => {
+        console.log(this.#attacks);
+        this.#attacks = this.#attacks.map((a) => {return {type: a.type, id: a.foo()}});
+        console.log(this.#attacks);
+    }
 
 
     makeDamage = (value) => {
-        this.hitPoints -= value;
-        if (this.hitPoints <= 0) this.die();
+        this.#hitPoints -= value;
+        if (this.#hitPoints <= 0) this.die();
         return this;
     }
 
     die = () => {
+        console.log("mod die");
         this.setAlive(false);
-        this.onDie.forEach((f) => f());
+        this.#attacks.forEach((a) => {
+                 if (a.type === 0) window.clearInterval(a.id);
+            else if (a.type === 1) window.clearTimeout(a.id);
+        })
+        this.#onDie.forEach((f) => f());
     }
 
     append = () => {
         Mob.getMobsArray().push(this);
-        this.attackOrder();
+        this.startAttacks();
     }
+
+
 }
 
 class Player extends GameObject {

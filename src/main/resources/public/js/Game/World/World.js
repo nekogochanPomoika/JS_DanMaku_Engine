@@ -29,7 +29,11 @@ class World {
 
     removeDead = () => {
         this.bullets = this.bullets.filter((b) => b.isAlive);
-        this.mobs = this.mobs.filter((b) => b.isAlive);
+        this.mobs = this.mobs.filter((b) => {
+            if (b.isAlive) return true;
+            b.die();
+            return false;
+        });
         console.log(this.bullets.length, this.mobs.length);
     }
     

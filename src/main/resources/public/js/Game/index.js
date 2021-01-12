@@ -40,39 +40,32 @@ function init() {
 }
 
 function testMob() {
-
     let mob =
         new Mob()
             .setWidth(64)
             .setHeight(64)
             .setCenter({x: world.width - 50, y: world.height * 7 / 8})
             .setAngle(-Math.PI)
-            .setMovingFunction(() => 5)
+            .setMovingFunction(() => 12);
 
-    let forwardAttack = () => {
+    let forwardAttack = (mob) => {
         Bullet.baseTestBullet()
-            .setMovingFunction(() => 20)
+            .setMovingFunction(() => 12)
             .setCenter(mob.center)
             .setAngle(Util.calculateAngle(mob.center, player.center))
             .append();
     }
 
-    let attackId;
+    mob.addIntervalAttack(() => {
+        console.log("shoot");
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                if (mob.isAlive) forwardAttack(mob);
+            }, i * 50);
+        }
+    }, 250);
 
-    mob.setAttackTypes([forwardAttack])
-        .setAttackOrder(() => {
-            attackId = setInterval(() => {
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => {
-                        forwardAttack()
-                    }, i * 100);
-                }
-            }, 500)
-        })
-        .setOnDie([() => {}])
-        .append();
-
-    setTimeout(window.clearInterval, 10000, attackId);
+    mob.append();
 }
 
 world.bulletRunTest();
