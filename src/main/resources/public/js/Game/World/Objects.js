@@ -79,13 +79,6 @@ class Bullet extends MovingObject {
      */
     static setBulletsArray = (bulletsArray) => {Bullet.getBulletArray = bulletsArray}
 
-    static baseTestBullet = () => {
-        return new Bullet()
-            .setColor("#b00")
-            .setWidth(16)
-            .setHeight(16);
-    }
-
     color;
 
     setColor = (color) => {this.color = color; return this}
@@ -162,8 +155,6 @@ class Mob extends MovingObject {
         Mob.getMobsArray().push(this);
         this.startAttacks();
     }
-
-
 }
 
 class Player extends GameObject {

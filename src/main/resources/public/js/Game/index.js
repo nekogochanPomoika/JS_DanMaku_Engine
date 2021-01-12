@@ -2,7 +2,7 @@ import {Game} from "./Game.js";
 import {Mob, Player} from "./World/Objects.js";
 import {World} from "./World/World.js";
 import {Bullet} from "./World/Objects.js";
-import {Util} from "../Util.js";
+import {BulletTemplates} from "./World/Templates.js";
 
 export {game};
 
@@ -48,22 +48,24 @@ function testMob() {
             .setAngle(-Math.PI)
             .setMovingFunction(() => 12);
 
-    let forwardAttack = (mob) => {
-        Bullet.baseTestBullet()
-            .setMovingFunction(() => 12)
-            .setCenter(mob.center)
-            .setAngle(Util.calculateAngle(mob.center, player.center))
-            .append();
-    }
-
     mob.addIntervalAttack(() => {
-        console.log("shoot");
         for (let i = 0; i < 3; i++) {
             setTimeout(() => {
-                if (mob.isAlive) forwardAttack(mob);
-            }, i * 50);
+                if (mob.isAlive)
+                    BulletTemplates
+                        .littleFocusBullet(mob.center, player.center, 15)
+                        .append();
+            }, i * 75);
         }
-    }, 250);
+    }, 500);
+
+    mob.addTimeoutAttack(() => {
+        BulletTemplates
+            .roundLittleFocusBulletsArray(
+                8, 50, mob.center, player.center
+            )
+            .forEach((b) => b.append());
+    }, 1500)
 
     mob.append();
 }
