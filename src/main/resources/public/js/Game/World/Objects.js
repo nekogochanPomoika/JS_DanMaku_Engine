@@ -79,7 +79,7 @@ class Bullet extends MovingObject {
      */
     static setBulletsArray = (bulletsArray) => {Bullet.getBulletArray = bulletsArray}
 
-    color;
+    color = "#b00";
 
     setColor = (color) => {this.color = color; return this}
 
@@ -129,9 +129,7 @@ class Mob extends MovingObject {
 
     // starts attack functions, set in array attacks intervals ids
     startAttacks = () => {
-        console.log(this.#attacks);
         this.#attacks = this.#attacks.map((a) => {return {type: a.type, id: a.foo()}});
-        console.log(this.#attacks);
     }
 
 
@@ -166,6 +164,14 @@ class Player extends GameObject {
     diagonalMovement = false;
     diagonalMovementCoef = Math.sqrt(2);
 
+    isImmunity = false;
+
+    lives = 3;
+
+    toStartPosition;
+
+    setToStartPosition = (toStartPosition) => {this.toStartPosition = toStartPosition; return this;}
+
     moveX = (left, right) => {
         if (left === right) {
             this.movingX = 0;
@@ -184,6 +190,28 @@ class Player extends GameObject {
             this.movingY = up ? -1 : 1;
             this.diagonalMovement = this.movingX !== 0;
         }
+    }
+
+    setImmunity = (duration) => {
+        this.isImmunity = true;
+        setTimeout(() => {
+            this.isImmunity = false;
+        }, duration);
+    }
+
+    getDamage = () => {
+        if (this.isImmunity) return;
+
+        this.lives--;
+        if (this.lives === 0) {
+            this.die();
+        } else {
+            this.toStartPosition();
+        }
+    }
+
+    die = () => {
+        console.log("player die");
     }
 
     update = () => {

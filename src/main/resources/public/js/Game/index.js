@@ -33,29 +33,56 @@ function init() {
     player
         .setHeight(64)
         .setWidth(64)
-        .setCenter({x: world.width / 2, y: world.height / 4});
+        .setCenter({x: world.width / 2, y: world.height * 7/8})
+        .setToStartPosition(() => {
+            let _moveX = player.moveX;
+            let _moveY = player.moveY;
+            let _baseVelocity = player.baseVelocity;
+            let _collideObject = world.collideObject;
+
+            player.baseVelocity = 6;
+            player.moveX = () => {};
+            player.moveY = () => {};
+            world.collideObject = () => {};
+
+            player.setCenter({
+                x: world.width / 2,
+                y: world.height + 60 * player.baseVelocity - 100
+            })
+            player.movingX = 0;
+            player.movingY = -1;
+            player.setImmunity(5000);
+
+            setTimeout(() => {
+                player.movingY = 0;
+                player.moveX = _moveX;
+                player.moveY = _moveY;
+                player.baseVelocity = _baseVelocity;
+                world.collideObject = _collideObject;
+            }, 1500);
+        }).toStartPosition();
 
     world.init(player);
     game.init(world);
 }
 
 function testMob() {
-    MobTemplates
-        .harmlessMob(
-            {x: 100, y: 1800},
-            Math.PI * 3 / 2,
-            () => 12
-        ).append();
-
-    MobTemplates
-        .oneShootMob(
-            {x: world.width - 200, y: 1600},
-            Math.PI * 3 / 2,
-            () => 12,
-            player.center,
-            20,
-            1500,
-        ).append();
+    new Mob()
+        .setWidth(128)
+        .setHeight(128)
+        .setX(1000)
+        .setY(1000)
+        .setAngle(0)
+        .setMovingFunction(() => 0)
+        .addIntervalAttack(() => {
+            BulletTemplates
+                .littleFocusBullet(
+                    {x: 0, y: 0},
+                    player.center,
+                    12
+                ).append();
+        }, 450)
+        .append();
 }
 
 world.bulletRunTest();

@@ -7,7 +7,6 @@ class BulletTemplates {
 
     static littleFocusBullet = (start, end, speed) => {
         return new Bullet()
-            .setColor("#b00")
             .setWidth(16)
             .setHeight(16)
             .setCenter(start)
@@ -25,7 +24,6 @@ class BulletTemplates {
         for (let i = 0; i < count; i++) {
             arr.push(
                 new Bullet()
-                    .setColor("#b00")
                     .setWidth(16)
                     .setHeight(16)
                     .setCenter(start)

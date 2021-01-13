@@ -1,3 +1,5 @@
+import {Util} from "../../Util.js";
+
 export {World};
 
 class World {
@@ -29,12 +31,12 @@ class World {
 
     removeDead = () => {
         this.bullets = this.bullets.filter((b) => b.isAlive);
-        this.mobs = this.mobs.filter((b) => {
-            if (b.isAlive) return true;
-            b.die();
+        this.mobs = this.mobs.filter((m) => {
+            if (m.isAlive) return true;
+            m.die();
             return false;
         });
-        console.log(this.bullets.length, this.mobs.length);
+        // console.log(this.bullets.length, this.mobs.length);
     }
     
     bulletRunTest = () => {
@@ -60,9 +62,21 @@ class World {
 
     update = (time) => {
         this.time = time;
+
         this.player.update();
         this.bullets.forEach((b) => {b.update()});
         this.mobs.forEach((m) => {m.update()});
+
         this.collideObject(this.player);
+
+        this.mobs.forEach((mob) => {
+            if (Util.isIntersect(mob, this.player)) this.player.getDamage();
+        })
+        this.bullets.forEach((bullet) => {
+            if (Util.isIntersect(bullet, this.player)) {
+                this.bullets.splice(this.bullets.indexOf(bullet), 1);
+                this.player.getDamage();
+            }
+        })
     }
 }
