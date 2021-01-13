@@ -52,6 +52,7 @@ function init() {
             player.movingX = 0;
             player.movingY = -1;
             player.setImmunity(5000);
+            player.canShoot = false;
 
             setTimeout(() => {
                 player.movingY = 0;
@@ -59,8 +60,10 @@ function init() {
                 player.moveY = _moveY;
                 player.baseVelocity = _baseVelocity;
                 world.collideObject = _collideObject;
+                player.canShoot = true;
             }, 1500);
-        }).toStartPosition();
+        })
+        .toStartPosition();
 
     world.init(player);
     game.init(world);
@@ -84,5 +87,3 @@ function testMob() {
         }, 450)
         .append();
 }
-
-world.bulletRunTest();

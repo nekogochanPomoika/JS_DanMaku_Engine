@@ -4,7 +4,7 @@ export {World};
 
 class World {
     time = 0;
-    backgroundColor = "#0001";
+    backgroundColor = "#0003";
 
     width = 2000;
     height = 2000;
@@ -26,7 +26,7 @@ class World {
             this.removeDead();
             setTimeout(removeDead, 100);
         };
-        setTimeout(removeDead, 100);
+        removeDead();
     }
 
     removeDead = () => {
@@ -38,9 +38,20 @@ class World {
         });
         // console.log(this.bullets.length, this.mobs.length);
     }
-    
-    bulletRunTest = () => {
 
+    update = (time) => {
+        this.time = time;
+
+        this.player.update();
+        this.bullets.forEach((b) => b.update());
+        this.mobs.forEach((m) => m.update());
+
+        this.collideObject(this.player);
+
+        this.mobs.forEach((mob) => {
+            if (Util.isIntersect(mob, this.player)) this.player.getDamage();
+        })
+        this.checkBulletsIntersect();
     }
 
     collideObject = (obj) => {
@@ -60,23 +71,15 @@ class World {
         }
     }
 
-    update = (time) => {
-        this.time = time;
 
-        this.player.update();
-        this.bullets.forEach((b) => {b.update()});
-        this.mobs.forEach((m) => {m.update()});
-
-        this.collideObject(this.player);
-
-        this.mobs.forEach((mob) => {
-            if (Util.isIntersect(mob, this.player)) this.player.getDamage();
-        })
-        this.bullets.forEach((bullet) => {
-            if (Util.isIntersect(bullet, this.player)) {
-                this.bullets.splice(this.bullets.indexOf(bullet), 1);
+    checkBulletsIntersect = () => {
+        this.bullets = this.bullets.filter((b) => {
+            if (Util.isIntersect(b, this.player)) {
                 this.player.getDamage();
+                return false;
+            } else {
+                return true;
             }
-        })
+        });
     }
 }

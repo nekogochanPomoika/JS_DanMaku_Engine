@@ -41,10 +41,10 @@ function resize() {
 
 function render() {
     display.fillColor(game.world.backgroundColor);
-    display.drawRect(game.world.player);
 
-    game.world.bullets.forEach((b) => {display.drawRect(b)});
     game.world.mobs.forEach((m) => {display.drawRect(m)});
+    game.world.bullets.forEach((b) => {display.drawRect(b)});
+    display.drawRect(game.world.player);
 
     display.render();
 }

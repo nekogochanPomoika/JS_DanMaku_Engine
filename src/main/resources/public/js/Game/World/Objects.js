@@ -165,6 +165,7 @@ class Player extends GameObject {
     diagonalMovementCoef = Math.sqrt(2);
 
     isImmunity = false;
+    canShoot = true;
 
     lives = 3;
 
