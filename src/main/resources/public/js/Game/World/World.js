@@ -4,15 +4,16 @@ export {World};
 
 class World {
     time = 0;
-    backgroundColor = "#0003";
+    backgroundColor = "#0004";
 
-    width = 2000;
+    width = 1000;
     height = 2000;
 
     player;
 
     mobs = [];
     bullets = [];
+    playerBullets = [];
 
     /**
      * @param player = Objects.Player.class
@@ -30,21 +31,24 @@ class World {
     }
 
     removeDead = () => {
-        this.bullets = this.bullets.filter((b) => b.isAlive);
         this.mobs = this.mobs.filter((m) => {
             if (m.isAlive) return true;
             m.die();
             return false;
         });
-        // console.log(this.bullets.length, this.mobs.length);
+        this.bullets = this.bullets.filter((b) => b.isAlive);
+        this.playerBullets = this.playerBullets.filter((b) => b.isAlive);
+
+        console.log(this.mobs.length, this.bullets.length, this.playerBullets.length);
     }
 
     update = (time) => {
         this.time = time;
 
         this.player.update();
-        this.bullets.forEach((b) => b.update());
         this.mobs.forEach((m) => m.update());
+        this.bullets.forEach((b) => b.update());
+        this.playerBullets.forEach((b) => b.update());
 
         this.collideObject(this.player);
 
@@ -52,6 +56,7 @@ class World {
             if (Util.isIntersect(mob, this.player)) this.player.getDamage();
         })
         this.checkBulletsIntersect();
+        this.checkPlayerBulletsIntersect();
     }
 
     collideObject = (obj) => {
@@ -71,15 +76,29 @@ class World {
         }
     }
 
-
     checkBulletsIntersect = () => {
         this.bullets = this.bullets.filter((b) => {
             if (Util.isIntersect(b, this.player)) {
-                this.player.getDamage();
+                this.player.makeDamage();
                 return false;
             } else {
                 return true;
             }
+        });
+    }
+
+    checkPlayerBulletsIntersect = () => {
+        this.playerBullets = this.playerBullets.filter((b) => {
+            let res = true;
+            for (let i = this.mobs.length - 1; i >= 0; i--) {
+                let m = this.mobs[i];
+                if (Util.isIntersect(m, b)) {
+                    m.makeDamage(b.damage);
+                    if (m.isAlive) this.mobs.splice(i, 1);
+                    res = false;
+                }
+            }
+            return res;
         });
     }
 }

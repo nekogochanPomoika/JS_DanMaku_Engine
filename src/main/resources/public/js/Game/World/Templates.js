@@ -7,8 +7,7 @@ class BulletTemplates {
 
     static littleFocusBullet = (start, end, speed) => {
         return new Bullet()
-            .setWidth(16)
-            .setHeight(16)
+            .setRadius(16)
             .setCenter(start)
             .setAngle(Util.calculateAngle(start, end))
             .setMovingFunction(() => speed);
@@ -24,8 +23,7 @@ class BulletTemplates {
         for (let i = 0; i < count; i++) {
             arr.push(
                 new Bullet()
-                    .setWidth(16)
-                    .setHeight(16)
+                    .setRadius(16)
                     .setCenter(start)
                     .setAngle(Math.PI * 2 * i / count + da)
                     .setMovingFunction(() => speed)
@@ -40,8 +38,7 @@ class MobTemplates {
 
     static harmlessMob = (start, angle, movingFunction) => {
         return new Mob()
-            .setWidth(64)
-            .setHeight(64)
+            .setRadius(64)
             .setCenter(start)
             .setAngle(angle)
             .setMovingFunction(movingFunction)

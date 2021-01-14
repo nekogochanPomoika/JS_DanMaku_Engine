@@ -1,38 +1,36 @@
 import {Util} from "../../Util.js";
 
-export {Bullet, Mob, Player};
+export {Bullet, Mob, Player, PlayerBullet};
 
 class GameObject {
-    width;
-    height;
+    radius;
     x;
     y;
     isAlive = true;
 
-    setWidth = (width) => {this.width = width; return this;}
-    setHeight = (height) => {this.height = height; return this;}
+    setRadius = (radius) => {this.radius = radius; return this;}
     setX = (x) => {this.x = x; return this;}
     setY = (y) => {this.y = y; return this;}
     setAlive = (alive) => {this.isAlive = alive; return this;}
 
-    setLeft = (a) => {this.x = a; return this;}
-    setRight = (a) => {this.x = a - this.width; return this;}
-    setTop = (a) => {this.y = a; return this;}
-    setBottom = (a) => {this.y = a - this.height; return this;}
+    setLeft = (a) => {this.x = a + this.radius; return this;}
+    setRight = (a) => {this.x = a - this.radius; return this;}
+    setTop = (a) => {this.y = a + this.radius; return this;}
+    setBottom = (a) => {this.y = a - this.radius; return this;}
     setCenter = (xy) => {
-        this.x = xy.x - this.width / 2;
-        this.y = xy.y - this.height / 2;
+        this.x = xy.x;
+        this.y = xy.y;
         return this;
     }
 
-    get left() {return this.x}
-    get right() {return this.x + this.width}
-    get top() {return this.y}
-    get bottom() {return this.y + this.height}
+    get left() {return this.x - this.radius}
+    get right() {return this.x + this.radius}
+    get top() {return this.y - this.radius}
+    get bottom() {return this.y + this.radius}
     get center() {
         return {
-            x: this.x + this.width / 2,
-            y: this.y + this.height / 2,
+            x: this.x,
+            y: this.y
         }
     }
 }
@@ -75,16 +73,35 @@ class Bullet extends MovingObject {
 
     static getBulletArray;
     /**
-     * @param bulletsArray = f() => [Bullet]
+     * @param getArray = f() => [Bullet]
      */
-    static setBulletsArray = (bulletsArray) => {Bullet.getBulletArray = bulletsArray}
+    static setBulletArray = (getArray) => {Bullet.getBulletArray = getArray}
 
     color = "#b00";
 
-    setColor = (color) => {this.color = color; return this}
-
     append = () => {
         Bullet.getBulletArray().push(this);
+    }
+}
+
+class PlayerBullet extends MovingObject {
+
+    // this class almost the same as the previous one,
+    // except that it uses a different array and refers to the bullets of the "player"
+
+    static getPlayerBulletArray;
+    static setPlayerBulletArray = (getArray) => {
+        PlayerBullet.getPlayerBulletArray = getArray;
+    }
+
+    damage;
+
+    setDamage = (damage) => {this.damage = damage; return this;}
+
+    color = "#b0b";
+
+    append = () => {
+        PlayerBullet.getPlayerBulletArray().push(this);
     }
 }
 
@@ -98,7 +115,7 @@ class Mob extends MovingObject {
 
     color = "#bb0";
 
-    #hitPoints;
+    #hitPoints = 1;
 
     #attacks = [];
 
@@ -158,20 +175,45 @@ class Mob extends MovingObject {
 class Player extends GameObject {
     color = "#0b0";
 
-    baseVelocity = 30;
+    baseVelocity = 22;
     movingX = 0;
     movingY = 0;
     diagonalMovement = false;
     diagonalMovementCoef = Math.sqrt(2);
 
     isImmunity = false;
+
     canShoot = true;
+    isShooting = false;
+    gunId;
 
     lives = 3;
 
     toStartPosition;
 
     setToStartPosition = (toStartPosition) => {this.toStartPosition = toStartPosition; return this;}
+
+    startShooting = (delay) => {
+        this.gunId = setInterval(() => {
+            if (this.isShooting && this.canShoot) this.shoot();
+        }, delay);
+        return this;
+    }
+
+    shoot = () => {
+        let createBullet = (dx) => {
+            new PlayerBullet()
+                .setAngle(-Math.PI / 2)
+                .setMovingFunction(() => 30)
+                .setRadius(10)
+                .setCenter({x: this.x + dx, y: this.y - 20})
+                .setDamage(1)
+                .append();
+        }
+
+        createBullet(-this.radius);
+        createBullet(this.radius);
+    }
 
     moveX = (left, right) => {
         if (left === right) {
@@ -200,7 +242,7 @@ class Player extends GameObject {
         }, duration);
     }
 
-    getDamage = () => {
+    makeDamage = () => {
         if (this.isImmunity) return;
 
         this.lives--;

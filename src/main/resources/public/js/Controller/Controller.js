@@ -6,6 +6,7 @@ class Controller {
     left = new Controller.ButtonInput();
     right = new Controller.ButtonInput();
     up = new Controller.ButtonInput();
+    z = new Controller.ButtonInput();
 
     keyDownUp = (event) => {
         let down = event.type === "keydown"; // or "keyup" (false)
@@ -15,13 +16,13 @@ class Controller {
             case 38: this.up.getInput(down); break;
             case 39: this.right.getInput(down); break;
             case 40: this.down.getInput(down); break;
+            case 90: this.z.getInput(down); break;
         }
     }
 }
 
 Controller.ButtonInput = class {
 
-    down = false;
     active = false;
 
     getInput = (down) => {

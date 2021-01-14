@@ -16,11 +16,6 @@ export class Util {
 
     static calculateAngle = (xy1, xy2) => Math.atan2(xy2.y - xy1.y, xy2.x - xy1.x)
 
-    static isIntersect = (r1, r2) => (
-        r2.right > r1.left &&
-        r1.right > r2.left &&
-        r2.bottom > r1.top &&
-        r1.bottom > r2.top
-    )
+    static isIntersect = (r1, r2) => Math.hypot(r2.x - r1.x, r2.y - r1.y) < r1.radius + r2.radius;
 
 }

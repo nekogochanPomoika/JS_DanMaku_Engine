@@ -42,9 +42,10 @@ function resize() {
 function render() {
     display.fillColor(game.world.backgroundColor);
 
-    game.world.mobs.forEach((m) => {display.drawRect(m)});
-    game.world.bullets.forEach((b) => {display.drawRect(b)});
-    display.drawRect(game.world.player);
+    game.world.mobs.forEach((m) => {display.drawCircle(m)});
+    game.world.bullets.forEach((b) => {display.drawCircle(b)});
+    game.world.playerBullets.forEach((b) => {display.drawCircle(b)});
+    display.drawCircle(game.world.player);
 
     display.render();
 }
@@ -52,5 +53,6 @@ function render() {
 function update(time) {
     game.world.player.moveX(controller.left.active, controller.right.active);
     game.world.player.moveY(controller.up.active, controller.down.active);
+    game.world.player.isShooting = controller.z.active;
     game.update(time);
 }

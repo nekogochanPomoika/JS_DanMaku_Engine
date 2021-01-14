@@ -1,7 +1,6 @@
 import {Game} from "./Game.js";
-import {Mob, Player} from "./World/Objects.js";
+import {Mob, Player, Bullet, PlayerBullet} from "./World/Objects.js";
 import {World} from "./World/World.js";
-import {Bullet} from "./World/Objects.js";
 import {BulletTemplates, MobTemplates} from "./World/Templates.js";
 
 export {game};
@@ -25,16 +24,16 @@ function staticFieldsInit() {
         b.left > world.width + settings.extraBounds ||
         b.top > world.height + settings.extraBounds
     )
-    Bullet.setBulletsArray(() => world.bullets);
     Mob.setMobsArray(() => world.mobs);
+    Bullet.setBulletArray(() => world.bullets);
+    PlayerBullet.setPlayerBulletArray(() => world.playerBullets);
 }
 
 function init() {
     player
-        .setHeight(64)
-        .setWidth(64)
-        .setCenter({x: world.width / 2, y: world.height * 7/8})
+        .setRadius(32)
         .setToStartPosition(() => {
+
             let _moveX = player.moveX;
             let _moveY = player.moveY;
             let _baseVelocity = player.baseVelocity;
@@ -51,7 +50,7 @@ function init() {
             })
             player.movingX = 0;
             player.movingY = -1;
-            player.setImmunity(5000);
+            player.setImmunity(4500);
             player.canShoot = false;
 
             setTimeout(() => {
@@ -63,7 +62,8 @@ function init() {
                 player.canShoot = true;
             }, 1500);
         })
-        .toStartPosition();
+        .startShooting(50)
+        .toStartPosition()
 
     world.init(player);
     game.init(world);
@@ -71,9 +71,8 @@ function init() {
 
 function testMob() {
     new Mob()
-        .setWidth(128)
-        .setHeight(128)
-        .setX(1000)
+        .setRadius(128)
+        .setX(750)
         .setY(1000)
         .setAngle(0)
         .setMovingFunction(() => 0)

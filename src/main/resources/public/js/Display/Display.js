@@ -33,6 +33,18 @@ class Display {
         this.#buffer.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 
+    /**
+     * @param circle = {
+     *     x, y, radius, color
+     * }
+     */
+    drawCircle = (circle) => {
+        this.#buffer.fillStyle = circle.color;
+        this.#buffer.beginPath();
+        this.#buffer.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+        this.#buffer.fill()
+    }
+
     render = () => {
         this.#context.drawImage(
             this.#buffer.canvas,
