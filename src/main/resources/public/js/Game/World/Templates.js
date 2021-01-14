@@ -1,5 +1,6 @@
-import {Bullet, Mob} from "./Objects.js";
 import {Util} from "../../Util.js";
+import {Bullet} from "./Objects/Bullet.js";
+import {Mob} from "./Objects/Mob.js";
 
 export {BulletTemplates, MobTemplates}
 
@@ -42,18 +43,6 @@ class MobTemplates {
             .setCenter(start)
             .setAngle(angle)
             .setMovingFunction(movingFunction)
-    }
-
-    static oneShootMob = (start, angle, movingFunction, target, bulletSpeed, attackDelay) => {
-        let mob = MobTemplates.harmlessMob(start, angle, movingFunction);
-        return mob
-            .addTimeoutAttack(() => {
-                if (mob.isAlive) {
-                    BulletTemplates
-                        .littleFocusBullet(mob.center, target, bulletSpeed)
-                        .append();
-                }
-            }, attackDelay);
     }
 
 }

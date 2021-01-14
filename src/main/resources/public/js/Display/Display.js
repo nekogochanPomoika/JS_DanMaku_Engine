@@ -45,6 +45,18 @@ class Display {
         this.#buffer.fill()
     }
 
+    drawPlayer = (player) => {
+        this.drawCircle(player);
+        player.spheres.forEach((s) => {
+            this.drawCircle({
+                x: player.x + s.dx,
+                y: player.y + s.dy,
+                radius: s.radius,
+                color: player.color
+            }) ;
+        });
+    }
+
     render = () => {
         this.#context.drawImage(
             this.#buffer.canvas,

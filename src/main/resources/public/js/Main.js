@@ -45,7 +45,9 @@ function render() {
     game.world.mobs.forEach((m) => {display.drawCircle(m)});
     game.world.bullets.forEach((b) => {display.drawCircle(b)});
     game.world.playerBullets.forEach((b) => {display.drawCircle(b)});
-    display.drawCircle(game.world.player);
+    game.world.loots.forEach((l) => {display.drawCircle(l)});
+
+    display.drawPlayer(game.world.player);
 
     display.render();
 }

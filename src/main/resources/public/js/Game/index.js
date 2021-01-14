@@ -1,7 +1,10 @@
 import {Game} from "./Game.js";
-import {Mob, Player, Bullet, PlayerBullet} from "./World/Objects.js";
 import {World} from "./World/World.js";
 import {BulletTemplates, MobTemplates} from "./World/Templates.js";
+import {Mob} from "./World/Objects/Mob.js";
+import {Player, AttackSphere} from "./World/Objects/Player.js";
+import {Bullet, PlayerBullet} from "./World/Objects/Bullet.js";
+import {Loot, PowerUpLoot} from "./World/Objects/Loot.js";
 
 export {game};
 
@@ -24,14 +27,42 @@ function staticFieldsInit() {
         b.left > world.width + settings.extraBounds ||
         b.top > world.height + settings.extraBounds
     )
+
     Mob.setMobsArray(() => world.mobs);
     Bullet.setBulletArray(() => world.bullets);
     PlayerBullet.setPlayerBulletArray(() => world.playerBullets);
+    Loot.setLootArray(() => world.loots);
+
+    Loot.setDefaultMovingFunction((loot) => {
+        let createTime = world.time;
+        loot.setMovingFunction(() => {
+            let dt = 1500 + createTime - world.time;
+            return dt / 333;
+        }).setAngle(-Math.PI / 2);
+    });
+
+    PowerUpLoot.setDefaultPowerUpFunction((powerUpLoot) => {
+        player.powerUp(powerUpLoot.value);
+    })
+
+    AttackSphere.setDefaultShoot((sphere) => {
+        new PlayerBullet()
+            .setAngle(-Math.PI / 2)
+            .setCenter({
+                x: player.x + sphere.dx,
+                y: player.y + sphere.dy
+            })
+            .setMovingFunction(() => 40)
+            .setRadius(15)
+            .setDamage(1)
+            .append();
+    })
+
 }
 
 function init() {
     player
-        .setRadius(32)
+        .setRadius(10)
         .setToStartPosition(() => {
 
             let _moveX = player.moveX;
@@ -70,19 +101,34 @@ function init() {
 }
 
 function testMob() {
-    new Mob()
-        .setRadius(128)
-        .setX(750)
-        .setY(1000)
-        .setAngle(0)
-        .setMovingFunction(() => 0)
-        .addIntervalAttack(() => {
-            BulletTemplates
-                .littleFocusBullet(
-                    {x: 0, y: 0},
-                    player.center,
-                    12
-                ).append();
-        }, 450)
-        .append();
+
+    let xy = {x: world.width / 2, y: world.height / 5}
+
+    let addMob = (dx) => {
+        let _xy = {x: xy.x + dx, y: xy.y};
+        new Mob()
+            .setRadius(50)
+            .setCenter(_xy)
+            .setHP(5)
+            .setAngle(0)
+            .setMovingFunction(() => 0)
+            .addIntervalAttack(() => {
+                BulletTemplates
+                    .littleFocusBullet(
+                        _xy,
+                        player.center,
+                        12
+                    ).append();
+            }, 450)
+            .addOnDie(() => {
+                new PowerUpLoot()
+                    .setCenter(_xy)
+                    .setValue(150)
+                    .append();
+            }).append();
+    }
+
+    for (let i = -400; i <= 400; i+=100) {
+        setTimeout(addMob, i, i);
+    }
 }

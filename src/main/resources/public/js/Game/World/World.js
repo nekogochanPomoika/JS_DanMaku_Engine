@@ -4,7 +4,7 @@ export {World};
 
 class World {
     time = 0;
-    backgroundColor = "#0004";
+    backgroundColor = "#000";
 
     width = 1000;
     height = 2000;
@@ -14,6 +14,7 @@ class World {
     mobs = [];
     bullets = [];
     playerBullets = [];
+    loots = [];
 
     /**
      * @param player = Objects.Player.class
@@ -38,25 +39,43 @@ class World {
         });
         this.bullets = this.bullets.filter((b) => b.isAlive);
         this.playerBullets = this.playerBullets.filter((b) => b.isAlive);
+        this.loots = this.loots.filter((l) => l.isAlive);
 
-        console.log(this.mobs.length, this.bullets.length, this.playerBullets.length);
+        //console.log(this.mobs.length, this.bullets.length, this.playerBullets.length, this.loots.length);
     }
 
+    sum = 0;
+    count = 0;
+
     update = (time) => {
+
+        let dt = window.performance.now();
+
         this.time = time;
 
         this.player.update();
         this.mobs.forEach((m) => m.update());
         this.bullets.forEach((b) => b.update());
         this.playerBullets.forEach((b) => b.update());
+        this.loots.forEach((l) => l.update());
 
         this.collideObject(this.player);
 
         this.mobs.forEach((mob) => {
-            if (Util.isIntersect(mob, this.player)) this.player.getDamage();
+            if (Util.isIntersect(mob, this.player)) this.player.makeDamage();
         })
         this.checkBulletsIntersect();
         this.checkPlayerBulletsIntersect();
+        this.triggerLoots();
+
+        dt -= window.performance.now();
+        dt = -dt;
+        this.sum += dt;
+        this.count++;
+        if (this.count % 100 === 0) {
+            console.log("100 ticks time:", this.sum);
+            this.sum = 0;
+        }
     }
 
     collideObject = (obj) => {
@@ -90,15 +109,32 @@ class World {
     checkPlayerBulletsIntersect = () => {
         this.playerBullets = this.playerBullets.filter((b) => {
             let res = true;
-            for (let i = this.mobs.length - 1; i >= 0; i--) {
-                let m = this.mobs[i];
+            this.mobs = this.mobs.filter((m) => {
                 if (Util.isIntersect(m, b)) {
-                    m.makeDamage(b.damage);
-                    if (m.isAlive) this.mobs.splice(i, 1);
                     res = false;
+                    m.makeDamage(b.damage);
                 }
-            }
+                return m.isAlive;
+            })
             return res;
+        });
+    }
+
+    triggerLoots = () => {
+        this.loots.forEach((l) => {
+            if (Util.isNearby(this.player, l, 150)) {
+                l.setAngle(Util.calculateAngle(l, this.player))
+                    .setMovingFunction(() => 18);
+            }
+        });
+        this.loots = this.loots.filter((l) => {
+            if (Util.isIntersect(this.player, l)) {
+                this.player.powerUp(l.value);
+                console.log(this.player.power);
+                return false;
+            } else {
+                return true;
+            }
         });
     }
 }
