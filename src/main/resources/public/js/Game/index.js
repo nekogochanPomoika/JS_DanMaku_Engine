@@ -98,7 +98,7 @@ function init() {
         .setExtraGunMovingFunction(() => {
             let ra = Util.rectToPolar(Util.getXYDistance(player.extraGun, player));
             player.extraGun.angle = ra.a;
-            return ra.r;
+            return ra.r / 5;
         })
         .startShooting(50)
         .toStartPosition()
@@ -130,7 +130,7 @@ function testMob() {
             .addOnDie(() => {
                 new PowerUpLoot()
                     .setCenter(_xy)
-                    .setValue(50)
+                    .setValue(100)
                     .append();
             }).append();
     }
