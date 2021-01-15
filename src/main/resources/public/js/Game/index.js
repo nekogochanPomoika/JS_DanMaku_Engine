@@ -21,7 +21,12 @@ staticFieldsInit();
 init();
 testMob();
 
+function getCurrentTime() {
+    return world.time;
+}
+
 function staticFieldsInit() {
+
     Bullet.setIsOutOfBounds((b) =>
         b.right < 0 - settings.extraBounds ||
         b.bottom < 0 - settings.extraBounds ||
@@ -37,14 +42,14 @@ function staticFieldsInit() {
     Loot.setDefaultMovingFunction((loot) => {
         let createTime = world.time;
         loot.setMovingFunction(() => {
-            let dt = 1500 + createTime - world.time;
-            return dt / 333;
+            let dt = 90 + createTime - world.time;
+            return dt / 15;
         }).setAngle(-Math.PI / 2);
     });
 
     PowerUpLoot.setDefaultPowerUpFunction((powerUpLoot) => {
         player.powerUp(powerUpLoot.value);
-    })
+    });
 
     AttackSphere.setDefaultShoot((sphere) => {
         new PlayerBullet()
@@ -53,15 +58,20 @@ function staticFieldsInit() {
                 x: player.extraGun.x + sphere.dx,
                 y: player.extraGun.y + sphere.dy
             })
-            .setMovingFunction(() => 40)
+            .setMovingFunction(() => 30)
             .setRadius(15)
             .setDamage(1)
             .append();
-    })
+    });
 
+    Util.addLoop = world.addLoop;
+    Util.removeLoop = world.removeLoop;
+    Util.addPromise = world.addPromise;
+    Util.getCurrentTime = () => world.time;
 }
 
 function init() {
+
     player
         .setRadius(10)
         .setToStartPosition(() => {
@@ -86,21 +96,21 @@ function init() {
             player.setImmunity(4500);
             player.canShoot = false;
 
-            setTimeout(() => {
+            Util.addPromise(() => {
                 player.movingY = 0;
                 player.moveX = _moveX;
                 player.moveY = _moveY;
                 player.baseVelocity = _baseVelocity;
                 world.collideObject = _collideObject;
                 player.canShoot = true;
-            }, 1500);
+            }, 90);
         })
         .setExtraGunMovingFunction(() => {
             let ra = Util.rectToPolar(Util.getXYDistance(player.extraGun, player));
             player.extraGun.angle = ra.a;
             return ra.r / 5;
         })
-        .startShooting(50)
+        .startShooting(3)
         .toStartPosition()
 
     world.init(player);
@@ -119,14 +129,14 @@ function testMob() {
             .setHP(5)
             .setAngle(0)
             .setMovingFunction(() => 0)
-            .addIntervalAttack(() => {
+            .addLoopAttack(() => {
                 BulletTemplates
                     .littleFocusBullet(
                         _xy,
                         player.center,
                         12
                     ).append();
-            }, 450)
+            }, 25)
             .addOnDie(() => {
                 new PowerUpLoot()
                     .setCenter(_xy)
@@ -136,6 +146,6 @@ function testMob() {
     }
 
     for (let i = -400; i <= 400; i+=100) {
-        setTimeout(addMob, i, i);
+        Util.addPromise(() => {addMob(i)}, (i + 450) / 3);
     }
 }

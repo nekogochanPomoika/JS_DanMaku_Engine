@@ -1,4 +1,5 @@
 import {MovingObject} from "./MovingObject.js";
+import {Util} from "../../../Util.js";
 
 export {Mob}
 
@@ -20,30 +21,39 @@ class Mob extends MovingObject {
 
     setHP = (hp) => {this.#hitPoints = hp; return this;}
     addOnDie = (onDie) => {this.#onDie.push(onDie); return this;}
-    /**
-     * @param type = [0 = interval, 1 = timeout]
-     * @param foo = [f() => interval / timeout ids]
-     */
-    #addAttack = (type, foo) => {
-        this.#attacks.push({type, foo});
+
+    addPromiseAttack = (foo, delay) => {
+        this.#attacks.push({
+            loop: false,
+            foo: () => {
+                Util.addPromiseAttack(() => {
+                    if (this.isAlive) foo();
+                }, delay);
+            }
+        });
         return this;
     }
 
-    addIntervalAttack = (foo, delay) => {
-        let _foo = () => setInterval(foo, delay)
-        this.#addAttack(0, _foo);
-        return this;
-    }
-
-    addTimeoutAttack = (foo, delay) => {
-        let _foo = () => setTimeout(foo, delay);
-        this.#addAttack(1, _foo);
+    addLoopAttack = (foo, delay) => {
+        this.#attacks.push({
+            loop: true,
+            foo: () => (Util.addLoop(foo, delay))
+        });
         return this;
     }
 
     // starts attack functions, set in array attacks intervals ids
     startAttacks = () => {
-        this.#attacks = this.#attacks.map((a) => {return {type: a.type, id: a.foo()}});
+        let _attacks = [];
+        this.#attacks.forEach((attack) => {
+            if (attack.loop) {
+                let id = attack.foo();
+                _attacks.push(id);
+            } else {
+                attack.foo();
+            }
+        });
+        this.#attacks = _attacks;
     }
 
 
@@ -56,10 +66,7 @@ class Mob extends MovingObject {
     die = () => {
         console.log("mod die");
         this.setAlive(false);
-        this.#attacks.forEach((a) => {
-            if (a.type === 0) window.clearInterval(a.id);
-            else if (a.type === 1) window.clearTimeout(a.id);
-        })
+        this.#attacks.forEach((id) => Util.removeLoop(id));
         this.#onDie.forEach((f) => f());
     }
 

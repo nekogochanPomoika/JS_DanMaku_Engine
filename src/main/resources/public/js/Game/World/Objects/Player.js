@@ -40,14 +40,15 @@ class Player extends GameObject {
     }
 
     startShooting = (delay) => {
-        this.gunId = setInterval(() => {
+        console.log("start shooting");
+        this.gunId = Util.addLoop(() => {
             if (this.isShooting && this.canShoot) this.shoot();
         }, delay);
         return this;
     }
 
     stopShooting = () => {
-        clearInterval(this.gunId);
+        Util.removeLoop(this.gunId);
     }
 
     shoot = () => {
@@ -88,7 +89,7 @@ class Player extends GameObject {
 
     setImmunity = (duration) => {
         this.isImmunity = true;
-        setTimeout(() => {
+        Util.addPromise(() => {
             this.isImmunity = false;
         }, duration);
     }

@@ -3,7 +3,9 @@ import {Util} from "../../Util.js";
 export {World};
 
 class World {
-    time = 0;
+
+    time = 0; // count of frames from start
+
     backgroundColor = "#000";
 
     width = 1400;
@@ -16,19 +18,57 @@ class World {
     playerBullets = [];
     loots = [];
 
+    promises = [];
+    newPromises = [];
+
+    loops = []; // infinity promises
+
     /**
      * @param player = Objects.Player.class
      */
     init = (player) => {
         this.player = player;
 
-        /* i used this instead of setInterval because I want the
-        countdown starts only when the function ends instead of it starts */
-        let removeDead = () => {
-            this.removeDead();
-            setTimeout(removeDead, 100);
-        };
-        removeDead();
+        this.addLoop(this.removeDead, 6);
+    }
+
+    addPromise = (foo, delay) => {
+        delay = Math.floor(delay);
+        this.newPromises.push({
+            time: delay + this.time,
+            foo,
+        });
+    }
+
+    addLoop = (foo, delay) => {
+        delay = Math.floor(delay);
+        let id = Math.floor(Math.random() * 10000);
+        while (!this.isUniqueId(id)) id++;
+
+        this.loops.push({
+            id,
+            foo,
+            delay,
+            startTime: this.time,
+        });
+
+        return id;
+    }
+
+    isUniqueId = (id) => {
+        for (let i = 0; i < this.loops.length; i++) {
+            if (this.loops[i].id === id) return false;
+        }
+        return true;
+    }
+
+    removeLoop = (id) => {
+        for (let i = 0; i < this.loops.length; i++) {
+            if (this.loops[i].id === id) {
+                this.loops.splice(i, 1);
+                return;
+            }
+        }
     }
 
     removeDead = () => {
@@ -41,17 +81,18 @@ class World {
         this.playerBullets = this.playerBullets.filter((b) => b.isAlive);
         this.loots = this.loots.filter((l) => l.isAlive);
 
-        //console.log(this.mobs.length, this.bullets.length, this.playerBullets.length, this.loots.length);
+        // console.log(this.mobs.length, this.bullets.length, this.playerBullets.length, this.loots.length);
     }
 
     sum = 0;
     count = 0;
 
-    update = (time) => {
+    update = () => {
+        this.time++;
+        this.checkPromises();
+        this.checkLoops();
 
         let dt = window.performance.now();
-
-        this.time = time;
 
         this.player.update();
         this.mobs.forEach((m) => m.update());
@@ -68,15 +109,32 @@ class World {
         this.checkPlayerBulletsIntersect();
         this.triggerLoots();
 
-        dt -= window.performance.now();
-        dt = -dt;
+        dt = window.performance.now() - dt;
         this.sum += dt;
         this.count++;
         if (this.count % 100 === 0) {
             console.log("100 ticks time:", this.sum);
-            console.log(this.player.extraGun);
             this.sum = 0;
         }
+    }
+
+    checkPromises = () => {
+        this.promises.push(...this.newPromises);
+        this.newPromises = [];
+        this.promises = this.promises.filter((promise) => {
+            if (this.time === promise.time) {
+                promise.foo();
+                return false;
+            } else {
+                return true;
+            }
+        });
+    }
+
+    checkLoops = () => {
+        this.loops.forEach((l) => {
+            if ((this.time - l.startTime) % l.delay === 0) l.foo();
+        })
     }
 
     collideObject = (obj) => {
