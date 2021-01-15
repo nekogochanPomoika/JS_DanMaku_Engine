@@ -1,9 +1,9 @@
 export class Util {
 
-    static rectToPolar = (x, y) => {
+    static rectToPolar = (xy) => {
         return {
-            r: Math.hypot(x, y),
-            a: Math.atan2(y, x),
+            r: Math.hypot(xy.x, xy.y),
+            a: Math.atan2(xy.y, xy.x),
         }
     }
 
@@ -19,5 +19,7 @@ export class Util {
     static isIntersect = (c1, c2) => Math.hypot(c2.x - c1.x, c2.y - c1.y) < c1.radius + c2.radius;
 
     static isNearby = (c1, c2, v) => Math.hypot(c2.x - c1.x, c2.y - c1.y) < c1.radius + c2.radius + v;
+
+    static getXYDistance = (c1, c2) => {return {x: c2.x - c1.x, y: c2.y - c1.y}};
 
 }

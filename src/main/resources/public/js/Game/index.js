@@ -5,6 +5,7 @@ import {Mob} from "./World/Objects/Mob.js";
 import {Player, AttackSphere} from "./World/Objects/Player.js";
 import {Bullet, PlayerBullet} from "./World/Objects/Bullet.js";
 import {Loot, PowerUpLoot} from "./World/Objects/Loot.js";
+import {Util} from "../Util.js";
 
 export {game};
 
@@ -49,8 +50,8 @@ function staticFieldsInit() {
         new PlayerBullet()
             .setAngle(-Math.PI / 2)
             .setCenter({
-                x: player.x + sphere.dx,
-                y: player.y + sphere.dy
+                x: player.extraGun.x + sphere.dx,
+                y: player.extraGun.y + sphere.dy
             })
             .setMovingFunction(() => 40)
             .setRadius(15)
@@ -79,6 +80,7 @@ function init() {
                 x: world.width / 2,
                 y: world.height + 60 * player.baseVelocity - 100
             })
+            player.extraGun.setCenter(player.center);
             player.movingX = 0;
             player.movingY = -1;
             player.setImmunity(4500);
@@ -92,6 +94,11 @@ function init() {
                 world.collideObject = _collideObject;
                 player.canShoot = true;
             }, 1500);
+        })
+        .setExtraGunMovingFunction(() => {
+            let ra = Util.rectToPolar(Util.getXYDistance(player.extraGun, player));
+            player.extraGun.angle = ra.a;
+            return ra.r;
         })
         .startShooting(50)
         .toStartPosition()
@@ -123,7 +130,7 @@ function testMob() {
             .addOnDie(() => {
                 new PowerUpLoot()
                     .setCenter(_xy)
-                    .setValue(150)
+                    .setValue(50)
                     .append();
             }).append();
     }

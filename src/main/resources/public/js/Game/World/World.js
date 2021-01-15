@@ -6,7 +6,7 @@ class World {
     time = 0;
     backgroundColor = "#000";
 
-    width = 1000;
+    width = 1400;
     height = 2000;
 
     player;
@@ -74,6 +74,7 @@ class World {
         this.count++;
         if (this.count % 100 === 0) {
             console.log("100 ticks time:", this.sum);
+            console.log(this.player.extraGun);
             this.sum = 0;
         }
     }

@@ -1,12 +1,15 @@
 import {GameObject} from "./GameObject.js";
 import {PlayerBullet} from "./Bullet.js";
+import {Util} from "../../../Util.js";
+import {MovingObject} from "./MovingObject.js";
 
 export {Player, AttackSphere}
 
 class Player extends GameObject {
+
     color = "#0b0";
 
-    baseVelocity = 18;
+    baseVelocity = 15;
     movingX = 0;
     movingY = 0;
     diagonalMovement = false;
@@ -18,7 +21,7 @@ class Player extends GameObject {
     isShooting = false;
     gunId;
     power = 0;
-    spheres = [];
+    extraGun = new ExtraGun();
 
     lives = 3;
 
@@ -26,52 +29,14 @@ class Player extends GameObject {
 
     setToStartPosition = (toStartPosition) => {this.toStartPosition = toStartPosition; return this;}
 
+    setExtraGunMovingFunction = (foo) => {this.extraGun.movingFunction = foo; return this;}
+
     powerUp = (value) => {
         this.power += value;
         if (this.power > 500) this.power = 500;
         let spheresCount = Math.floor(this.power / 100);
-        if (spheresCount !== this.spheres.length) this.changeSpheresCount(spheresCount);
+        if (spheresCount !== this.extraGun.spheres.length) this.extraGun.remakeSpheres(spheresCount);
         return this;
-    }
-
-    changeSpheresCount = (count) => {
-        switch (count) {
-            case 1:
-                this.spheres = [
-                    new AttackSphere().setDY(-150)
-                ];
-                break;
-            case 2:
-                this.spheres = [
-                    new AttackSphere().setDY(-100).setDX(-100),
-                    new AttackSphere().setDY(-100).setDX(100)
-                ];
-                break;
-            case 3:
-                this.spheres = [
-                    new AttackSphere().setDY(-150),
-                    new AttackSphere().setDY(-100).setDX(-120),
-                    new AttackSphere().setDY(-100).setDX(120)
-                ];
-                break;
-            case 4:
-                this.spheres = [
-                    new AttackSphere().setDY(-100).setDX(-100),
-                    new AttackSphere().setDY(-100).setDX(100),
-                    new AttackSphere().setDX(-200),
-                    new AttackSphere().setDX(200)
-                ];
-                break;
-            case 5:
-                this.spheres = [
-                    new AttackSphere().setDY(-150),
-                    new AttackSphere().setDY(-100).setDX(-120),
-                    new AttackSphere().setDY(-100).setDX(120),
-                    new AttackSphere().setDX(-220),
-                    new AttackSphere().setDX(220)
-                ];
-                break;
-        }
     }
 
     startShooting = (delay) => {
@@ -88,7 +53,7 @@ class Player extends GameObject {
     shoot = () => {
         this.createBullet(-25);
         this.createBullet(25);
-        this.spheres.forEach((s) => s.shoot());
+        this.extraGun.shoot();
     }
 
     createBullet = (dx) => {
@@ -154,7 +119,62 @@ class Player extends GameObject {
 
         this.x += dx;
         this.y += dy;
+
+        this.extraGun.update();
     }
+}
+
+class ExtraGun extends MovingObject {
+
+    spheres = [];
+    distance = 150;
+
+    remakeSpheres = (count) => {
+        let angles = [];
+        let PI = Math.PI
+        switch (count) {
+            case 1:
+                angles = [0];
+                break;
+            case 2:
+                angles = [PI/4, -PI/4];
+                break;
+            case 3:
+                angles = [0, PI/3, -PI/3];
+                break;
+            case 4:
+                angles = [PI/6, -PI/6, PI/2, -PI/2]
+                break;
+            case 5:
+                angles = [0, PI/4, -PI/4, PI/2, -PI/2];
+                break;
+        }
+        angles = angles.map((a) => a - PI/2);
+        this.spheres = [];
+
+        for (let i = 0; i < count; i++) {
+            let dxy = Util.polarToRect(this.distance, angles[i]);
+            this.spheres[i] = new AttackSphere().setDX(dxy.x).setDY(dxy.y);
+        }
+    }
+
+    shoot = () => {
+        this.spheres.forEach((s) => s.shoot());
+    }
+
+    asCirclesArray = () => {
+        let res = [];
+        this.spheres.forEach((s) => {
+            res.push({
+                x: this.x + s.dx,
+                y: this.y + s.dy,
+                radius: s.radius,
+                color: "#0bb"
+            });
+        })
+        return res;
+    }
+
 }
 
 class AttackSphere extends GameObject {
@@ -162,20 +182,11 @@ class AttackSphere extends GameObject {
     static defaultShoot;
     static setDefaultShoot = (foo) => {AttackSphere.defaultShoot = foo}
 
-    static fromDXYArr = (dxyArr) => {
-        let res = [];
-        dxyArr.forEach((dxy) => {
-            res.push(new AttackSphere().setDX(dxy.dx).setDY(dxy.dy));
-        })
-        return res;
-    }
-
     color = "#4b0";
-
     radius = 25;
 
-    dx = 0;
-    dy = 0;
+    dx;
+    dy;
 
     setDX = (dx) => {this.dx = dx; return this;}
     setDY = (dy) => {this.dy = dy; return this;}
