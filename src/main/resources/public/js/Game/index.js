@@ -93,7 +93,7 @@ function init() {
             player.extraGun.setCenter(player.center);
             player.movingX = 0;
             player.movingY = -1;
-            player.setImmunity(4500);
+            player.setImmunity(270);
             player.canShoot = false;
 
             Util.addPromise(() => {

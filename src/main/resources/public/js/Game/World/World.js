@@ -103,7 +103,7 @@ class World {
         this.collideObject(this.player);
 
         this.mobs.forEach((mob) => {
-            if (Util.isIntersect(mob, this.player)) this.player.makeDamage();
+            if (Util.isIntersectCC(mob, this.player)) this.player.makeDamage();
         })
         this.checkBulletsIntersect();
         this.checkPlayerBulletsIntersect();
@@ -156,7 +156,7 @@ class World {
 
     checkBulletsIntersect = () => {
         this.bullets = this.bullets.filter((b) => {
-            if (Util.isIntersect(b, this.player)) {
+            if (Util.isIntersectCC(b, this.player)) {
                 this.player.makeDamage();
                 return false;
             } else {
@@ -169,7 +169,7 @@ class World {
         this.playerBullets = this.playerBullets.filter((b) => {
             let res = true;
             this.mobs = this.mobs.filter((m) => {
-                if (Util.isIntersect(m, b)) {
+                if (Util.isIntersectCC(m, b)) {
                     res = false;
                     m.makeDamage(b.damage);
                 }
@@ -187,7 +187,7 @@ class World {
             }
         });
         this.loots = this.loots.filter((l) => {
-            if (Util.isIntersect(this.player, l)) {
+            if (Util.isIntersectCC(this.player, l)) {
                 this.player.powerUp(l.value);
                 console.log(this.player.power);
                 return false;
