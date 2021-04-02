@@ -19,10 +19,16 @@ class MovingObject extends GameObject {
 
     setAngle = (angle) => {this.angle = angle; return this;}
 
-    /**
-     * @param movingFunction = f() => {dr}
-     */
     setMovingFunction = (movingFunction) => {this.movingFunction = movingFunction; return this};
+
+    inColliderOf(circle) {
+        return false;
+    }
+
+    setInColliderFoo(foo) {
+        this.inColliderOf = foo;
+        return this;
+    }
 
     update() {
         let dr = this.movingFunction();
@@ -32,7 +38,7 @@ class MovingObject extends GameObject {
         this.y += dxy.y;
 
         if (MovingObject.isOutOfBounds(this)) {
-            this.isAlive = false;
+            this.die();
         }
     }
 }

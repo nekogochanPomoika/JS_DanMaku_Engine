@@ -16,16 +16,15 @@ export class Util {
 
     static calculateAngle = (xy1, xy2) => Math.atan2(xy2.y - xy1.y, xy2.x - xy1.x)
 
-    static isNearby = (c1, c2, v) => Math.hypot(c2.x - c1.x, c2.y - c1.y) < c1.radius + c2.radius + v;
+    static isNearby = (c1, c2, v) => Math.hypot(c2.x - c1.x, c2.y - c1.y) < v;
 
-    static getXYDistance = (c1, c2) => {return {x: c2.x - c1.x, y: c2.y - c1.y}};
-
-    // C = circle, F - figure (with points)
-
-    static isIntersectCC = (c1, c2) => Math.hypot(c2.x - c1.x, c2.y - c1.y) < c1.radius + c2.radius;
-
-    static isIntersectCF = (c, f) => {
-
+    static xyDistance(p1, p2) {
+        return {
+            x: p1.x - p2.x,
+            y: p1.y - p2.y
+        };
     }
+
+    static distance = (p1, p2) => Math.hypot(p2.x - p1.x, p2.y - p1.y);
 
 }

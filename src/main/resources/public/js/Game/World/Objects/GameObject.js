@@ -2,31 +2,29 @@
 export {GameObject}
 
 class GameObject {
-    radius;
     x;
     y;
-    isAlive = true;
+    alive = true;
+    onDie;
 
-    setRadius = (radius) => {this.radius = radius; return this;}
-    setX = (x) => {this.x = x; return this;}
-    setY = (y) => {this.y = y; return this;}
-    setAlive = (alive) => {this.isAlive = alive; return this;}
+    setAlive(alive) {this.alive = alive; return this;}
 
-    setLeft = (a) => {this.x = a + this.radius; return this;}
-    setRight = (a) => {this.x = a - this.radius; return this;}
-    setTop = (a) => {this.y = a + this.radius; return this;}
-    setBottom = (a) => {this.y = a - this.radius; return this;}
-    setCenter = (xy) => {
+    isAlive() {
+        return this.alive;
+    }
+
+    setOnDie(onDie) {
+        this.onDie = onDie;
+        return this;
+    };
+
+    setCenter(xy) {
         this.x = xy.x;
         this.y = xy.y;
         return this;
     }
 
-    get left() {return this.x - this.radius}
-    get right() {return this.x + this.radius}
-    get top() {return this.y - this.radius}
-    get bottom() {return this.y + this.radius}
-    get center() {
+    getCenter() {
         return {
             x: this.x,
             y: this.y

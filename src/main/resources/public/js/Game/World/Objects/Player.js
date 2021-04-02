@@ -61,7 +61,6 @@ class Player extends GameObject {
         new PlayerBullet()
             .setAngle(-Math.PI / 2)
             .setMovingFunction(() => 40)
-            .setRadius(15)
             .setCenter({x: this.x + dx, y: this.y - 20})
             .setDamage(1)
             .append();
@@ -123,6 +122,16 @@ class Player extends GameObject {
 
         this.extraGun.update();
     }
+
+    setRadius = (radius) => {this.radius = radius; return this;}
+    setLeft = (a) => {this.x = a + this.radius; return this;}
+    setRight = (a) => {this.x = a - this.radius; return this;}
+    setTop = (a) => {this.y = a + this.radius; return this;}
+    setBottom = (a) => {this.y = a - this.radius; return this;}
+    getLeft() {return this.x - this.radius}
+    getRight() {return this.x + this.radius}
+    getTop() {return this.y - this.radius}
+    getBottom() {return this.y + this.radius}
 }
 
 class ExtraGun extends MovingObject {

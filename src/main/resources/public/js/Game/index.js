@@ -21,10 +21,6 @@ staticFieldsInit();
 init();
 testMob();
 
-function getCurrentTime() {
-    return world.time;
-}
-
 function staticFieldsInit() {
 
     Bullet.setIsOutOfBounds((b) =>
@@ -59,7 +55,6 @@ function staticFieldsInit() {
                 y: player.extraGun.y + sphere.dy
             })
             .setMovingFunction(() => 30)
-            .setRadius(15)
             .setDamage(1)
             .append();
     });
@@ -82,18 +77,21 @@ function init() {
             let _collideObject = world.collideObject;
 
             player.baseVelocity = 6;
-            player.moveX = () => {};
-            player.moveY = () => {};
-            world.collideObject = () => {};
+            player.moveX = () => {
+            };
+            player.moveY = () => {
+            };
+            world.collideObject = () => {
+            };
 
             player.setCenter({
                 x: world.width / 2,
                 y: world.height + 60 * player.baseVelocity - 100
             })
-            player.extraGun.setCenter(player.center);
+            player.extraGun.setCenter(player.getCenter);
             player.movingX = 0;
             player.movingY = -1;
-            player.setImmunity(270);
+            player.setImmunity(9999999);
             player.canShoot = false;
 
             Util.addPromise(() => {
@@ -106,12 +104,12 @@ function init() {
             }, 90);
         })
         .setExtraGunMovingFunction(() => {
-            let ra = Util.rectToPolar(Util.getXYDistance(player.extraGun, player));
+            let ra = Util.rectToPolar(Util.xyDistance(player.extraGun, player));
             player.extraGun.angle = ra.a;
             return ra.r / 5;
         })
         .startShooting(3)
-        .toStartPosition()
+        .toStartPosition();
 
     world.init(player);
     game.init(world);
@@ -121,31 +119,23 @@ function testMob() {
 
     let xy = {x: world.width / 2, y: world.height / 5}
 
-    let addMob = (dx) => {
-        let _xy = {x: xy.x + dx, y: xy.y};
-        new Mob()
-            .setRadius(50)
-            .setCenter(_xy)
-            .setHP(5)
-            .setAngle(0)
-            .setMovingFunction(() => 0)
+    let addMob = (i) => {
+        let pos = {x: xy.x, y: -50};
+        let endPos = {x: i, y: xy.y};
+        let mob = MobTemplates.fishWithLoot(0.5);
+        mob.setCenter(pos)
+            .setAngle(Util.calculateAngle(pos, endPos))
+            .setMovingFunction(() => Util.distance(pos, endPos))
             .addLoopAttack(() => {
-                BulletTemplates
-                    .littleFocusBullet(
-                        _xy,
-                        player.center,
-                        12
-                    ).append();
-            }, 25)
-            .addOnDie(() => {
-                new PowerUpLoot()
-                    .setCenter(_xy)
-                    .setValue(100)
-                    .append();
-            }).append();
+                BulletTemplates.base(mob.getCenter(), player.getCenter(), 10, 3);
+            })
+            .append()
+        ;
     }
 
-    for (let i = -400; i <= 400; i+=100) {
-        Util.addPromise(() => {addMob(i)}, (i + 450) / 3);
+    for (let i = -300; i <= 300; i += 50) {
+        Util.addPromise(() => {
+            addMob(i)
+        }, (i + 450) / 3);
     }
 }

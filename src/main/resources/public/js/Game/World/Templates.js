@@ -1,48 +1,44 @@
 import {Util} from "../../Util.js";
 import {Bullet} from "./Objects/Bullet.js";
 import {Mob} from "./Objects/Mob.js";
+import {Loot, PowerUpLoot} from "./Objects/Loot.js";
 
-export {BulletTemplates, MobTemplates}
+export class BulletTemplates {
 
-class BulletTemplates {
-
-    static littleFocusBullet = (start, end, speed) => {
+    static base(from, to, speed, radius) {
         return new Bullet()
-            .setRadius(16)
-            .setCenter(start)
-            .setAngle(Util.calculateAngle(start, end))
-            .setMovingFunction(() => speed);
-    }
-
-    static roundLittleFocusBulletsArray = (speed, count, start, end) => {
-        return BulletTemplates.roundLittleBulletsArray(speed, count, start, Util.calculateAngle(start, end));
-    }
-
-    static roundLittleBulletsArray = (speed, count, start, da) => {
-        if (da === undefined) da = 0;
-        let arr = [];
-        for (let i = 0; i < count; i++) {
-            arr.push(
-                new Bullet()
-                    .setRadius(16)
-                    .setCenter(start)
-                    .setAngle(Math.PI * 2 * i / count + da)
-                    .setMovingFunction(() => speed)
-            );
-        }
-        return arr;
+            .setCenter(from)
+            .setAngle(Util.calculateAngle(from, to))
+            .setMovingFunction(() => speed)
+            .setInColliderFoo(function (c) {
+                return Util.isNearby(this.getCenter(), c.getCenter(), radius);
+            });
     }
 
 }
 
-class MobTemplates {
+export class MobTemplates {
 
-    static harmlessMob = (start, angle, movingFunction) => {
+    /**
+     * @returns {Mob}
+     */
+    static fish() {
         return new Mob()
-            .setRadius(64)
-            .setCenter(start)
-            .setAngle(angle)
-            .setMovingFunction(movingFunction)
+            .setHP(10)
+            .setOnDie(() => {})
+        ;
+    }
+
+    /**
+     * @param {number} probability
+     * @returns {Mob}
+     */
+    static fishWithLoot(probability) {
+        return MobTemplates.fish()
+            .setOnDie(function () {
+                if (probability > Math.random()) new PowerUpLoot().setCenter(this.getCenter());
+            })
+        ;
     }
 
 }

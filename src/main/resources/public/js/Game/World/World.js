@@ -2,14 +2,19 @@ import {Util} from "../../Util.js";
 
 export {World};
 
+function nextInt() {
+    return nextInt.i++;
+}
+nextInt.i = Number.MIN_SAFE_INTEGER;
+
 class World {
 
     time = 0; // count of frames from start
 
     backgroundColor = "#000";
 
-    width = 1400;
-    height = 2000;
+    width = 700;
+    height = 1000;
 
     player;
 
@@ -26,11 +31,18 @@ class World {
     /**
      * @param player = Objects.Player.class
      */
-    init = (player) => {
+    init(player) {
         this.player = player;
-
         this.addLoop(this.removeDead, 6);
+        setInterval(this.log, 1000);
     }
+
+    log = () => {
+        console.log("ticks, time, time per tick:", this.count, this.sum, this.sum / this.count);
+        console.log(this.mobs.length, this.bullets.length, this.playerBullets.length, this.loots.length);
+        this.sum = 0;
+        this.count = 0;
+    };
 
     addPromise = (foo, delay) => {
         delay = Math.floor(delay);
@@ -38,12 +50,11 @@ class World {
             time: delay + this.time,
             foo,
         });
-    }
+    };
 
     addLoop = (foo, delay) => {
-        delay = Math.floor(delay);
-        let id = Math.floor(Math.random() * 10000);
-        while (!this.isUniqueId(id)) id++;
+
+        let id = nextInt();
 
         this.loops.push({
             id,
@@ -53,23 +64,16 @@ class World {
         });
 
         return id;
-    }
+    };
 
-    isUniqueId = (id) => {
-        for (let i = 0; i < this.loops.length; i++) {
-            if (this.loops[i].id === id) return false;
-        }
-        return true;
-    }
-
-    removeLoop = (id) => {
+    removeLoop = id => {
         for (let i = 0; i < this.loops.length; i++) {
             if (this.loops[i].id === id) {
                 this.loops.splice(i, 1);
                 return;
             }
         }
-    }
+    };
 
     removeDead = () => {
         this.mobs = this.mobs.filter((m) => {
@@ -80,14 +84,12 @@ class World {
         this.bullets = this.bullets.filter((b) => b.isAlive);
         this.playerBullets = this.playerBullets.filter((b) => b.isAlive);
         this.loots = this.loots.filter((l) => l.isAlive);
-
-        // console.log(this.mobs.length, this.bullets.length, this.playerBullets.length, this.loots.length);
-    }
+    };
 
     sum = 0;
     count = 0;
 
-    update = () => {
+    update() {
         this.time++;
         this.checkPromises();
         this.checkLoops();
@@ -103,7 +105,7 @@ class World {
         this.collideObject(this.player);
 
         this.mobs.forEach((mob) => {
-            if (Util.isIntersectCC(mob, this.player)) this.player.makeDamage();
+            if (mob.inColliderOf(this.player)) this.player.makeDamage();
         })
         this.checkBulletsIntersect();
         this.checkPlayerBulletsIntersect();
@@ -112,13 +114,9 @@ class World {
         dt = window.performance.now() - dt;
         this.sum += dt;
         this.count++;
-        if (this.count % 100 === 0) {
-            console.log("100 ticks time:", this.sum);
-            this.sum = 0;
-        }
     }
 
-    checkPromises = () => {
+    checkPromises() {
         this.promises.push(...this.newPromises);
         this.newPromises = [];
         this.promises = this.promises.filter((promise) => {
@@ -131,32 +129,28 @@ class World {
         });
     }
 
-    checkLoops = () => {
+    checkLoops() {
         this.loops.forEach((l) => {
             if ((this.time - l.startTime) % l.delay === 0) l.foo();
         })
     }
 
-    collideObject = (obj) => {
-        if (obj.left < 0) {
+    collideObject(obj) {
+        if (obj.getLeft() < 0) {
             obj.setLeft(0);
-            obj.velocityX = 0;
-        } else if (obj.right > this.width) {
+        } else if (obj.getRight() > this.width) {
             obj.setRight(this.width);
-            obj.velocityX = 0;
         }
-        if (obj.top < 0) {
+        if (obj.getTop() < 0) {
             obj.setTop(0);
-            obj.velocityY = 0;
-        } else if (obj.bottom > this.height) {
+        } else if (obj.getBottom() > this.height) {
             obj.setBottom(this.height);
-            obj.velocityY = 0;
         }
     }
 
-    checkBulletsIntersect = () => {
+    checkBulletsIntersect() {
         this.bullets = this.bullets.filter((b) => {
-            if (Util.isIntersectCC(b, this.player)) {
+            if (b.inColliderOf(this.player)) {
                 this.player.makeDamage();
                 return false;
             } else {
@@ -165,11 +159,11 @@ class World {
         });
     }
 
-    checkPlayerBulletsIntersect = () => {
+    checkPlayerBulletsIntersect() {
         this.playerBullets = this.playerBullets.filter((b) => {
             let res = true;
             this.mobs = this.mobs.filter((m) => {
-                if (Util.isIntersectCC(m, b)) {
+                if (b.inColliderOf(m)) {
                     res = false;
                     m.makeDamage(b.damage);
                 }
@@ -179,7 +173,7 @@ class World {
         });
     }
 
-    triggerLoots = () => {
+    triggerLoots() {
         this.loots.forEach((l) => {
             if (Util.isNearby(this.player, l, 150)) {
                 l.setAngle(Util.calculateAngle(l, this.player))
@@ -187,7 +181,7 @@ class World {
             }
         });
         this.loots = this.loots.filter((l) => {
-            if (Util.isIntersectCC(this.player, l)) {
+            if (Util.isNearby(this.player, l, 10)) {
                 this.player.powerUp(l.value);
                 console.log(this.player.power);
                 return false;

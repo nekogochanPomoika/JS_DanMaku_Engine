@@ -10,11 +10,20 @@ class Bullet extends MovingObject {
      */
     static setBulletArray = (getArray) => {Bullet.getBulletArray = getArray}
 
-    color = "#b00";
-
-    append = () => {
+    append() {
         Bullet.getBulletArray().push(this);
     }
+
+    copy() {
+        return new Bullet()
+            .setCenter(this.getCenter())
+            .setMovingFunction(this.movingFunction)
+            .setOnDie(this.onDie)
+            .setAngle(this.angle)
+            .setInColliderFoo(this.inColliderOf)
+        ;
+    }
+
 }
 
 class PlayerBullet extends MovingObject {
