@@ -60,6 +60,8 @@ function init() {
     player
         .setToStartPosition(() => {
 
+            console.log("to start pos");
+
             let _speed = player.speed;
             let _moveX = player.moveX;
             let _moveY = player.moveY;
@@ -112,16 +114,21 @@ function initLevel() {
 
     world.addPromise(step3, 700);
 
-    world.addPromise(step4, 1600);
-
     world.addPromise(() => {
         step2();
         step3();
-    }, 2500);
+    })
+
+    world.addPromise(step4, 1600);
+
+    world.addPromise(() => {
+        step4();
+        step3();
+    }, 2100);
 
     world.addPromise(step1, 2800);
 
-    world.addPromise(step5, 3600);
+    world.addPromise(step5, 3000);
 }
 
 function step1() {
@@ -349,7 +356,7 @@ function ebalai(count, x, left, forwardTime, diveTime) {
 
 function bogdanPidor() {
 
-    let hp = 300;
+    let hp = 3000;
 
     let stagesHP = [];
 
@@ -393,17 +400,14 @@ function bogdanPidor() {
 
     let boss_makeDamage = boss.makeDamage;
     boss.makeDamage = (value) => {
-        let returnValue = boss_makeDamage(value);
+        boss_makeDamage(value);
         checkStage(boss.getHP());
-        return returnValue;
     };
 
     function checkStage() {
-        console.log("1:" + boss.getHP())
         if (boss.getHP() < stagesHP[1]) {
             putin();
             checkStage = function () {
-                console.log("2: " + boss.getHP());
                 if (boss.getHP() < stagesHP[2]) {
                     hitler();
                     checkStage = function () {};

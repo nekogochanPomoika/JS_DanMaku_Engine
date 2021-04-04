@@ -67,7 +67,7 @@ class Mob extends MovingObject {
 
     makeDamage = (value) => {
         this.#hitPoints -= value;
-        if (this.#hitPoints <= 0) this.setAlive(false);
+        if (this.#hitPoints <= 0) this.die();
         return this;
     }
 

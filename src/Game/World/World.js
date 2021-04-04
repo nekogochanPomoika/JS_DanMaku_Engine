@@ -217,7 +217,6 @@ void main() {
                 if (b.inColliderOf(m)) {
                     res = false;
                     m.makeDamage(b.damage);
-                    m.die();
                     b.die();
                 }
                 return m.isAlive();

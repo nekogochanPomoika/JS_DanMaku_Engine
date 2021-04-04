@@ -51,8 +51,6 @@ class Player extends GameObject {
         let spheresCount = Math.floor(this.power / 100);
         if (spheresCount !== this.extraGun.spheres.length) this.extraGun.remakeSpheres(spheresCount);
 
-        console.log(this);
-
         return this;
     }
 
@@ -186,7 +184,6 @@ class ExtraGun {
 
         for (let i = 0; i < count; i++) {
             let dxy = Util.polarToRect(this.distance, angles[i]);
-            console.log(this.distance, angles[i], dxy);
             this.spheres[i] =
                 new AttackSphere()
                     .setDX(dxy.x)
