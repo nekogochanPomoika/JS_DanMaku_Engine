@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game</title>
+    <script defer src="public/bundle.js"></script>
+</head>
+<body>
+    <canvas style="display: inline-block" id="gameScreen">Canvas not loaded</canvas>
+    <div id="root" style="display:inline-block;">
+        <h1>Какая то девка псевдоакулка убивает котов из мемов (так и было задумано)</h1>
+        <p>
+            <b>Z</b> - стрелять
+            Стрелочки - двигаться
+            Включить выключить мызку - кнопочка ниже
+        </p>
+        <button id="hitler" state="off">Включить звук</button>
+        <audio id="ziga" src="huy.wav" loop></audio>
+        <script defer>
+            let audio = document.getElementById("ziga");
+            let button = document.getElementById("hitler")
+
+            button.onclick = () => {
+                let on = button.state === "on";
+                if (on) {
+                    audio.pause();
+                    button.state = "off";
+                    button.innerText = "Включить звук";
+                } else {
+                    audio.play();
+                    button.state = "on";
+                    button.innerText = "Выключить звук";
+                }
+            }
+        </script>
+    </div>
+</body>
+</html>
